@@ -137,3 +137,36 @@ class RecognizerResult(PIIEntity):
 
         # otherwise the intersection is min(end) - max(start)
         return min(self.end, other.end) - max(self.start, other.start)
+    
+import pytest    
+from presidio_anonymizer.entities.engine.recognizer_result import RecognizerResult
+@pytest.mark.parametrize(
+    "start1, end1, start2, end2, expected_intersection",
+    [
+        # No overlap - completely before
+        (0, 5, 6, 10, 0),
+        # No overlap - completely after
+        (10, 15, 0, 9, 0),
+        # Exact touching boundary - end == start
+        (0, 5, 5, 10, 0),
+        (5, 10, 0, 5, 0),
+        # Full overlap
+        (0, 10, 0, 10, 10),
+        # Complete Containment
+        (0, 10, 2, 5, 3),
+        (2, 5, 0, 10, 3),
+        # Partial overlaps
+        (0, 10, 5, 15, 5),
+        (5, 15, 0, 10, 5),
+        (0, 6, 5, 10, 1),
+        (5, 10, 0, 6, 1),
+    ]
+)
+def test_intersects(start1, end1, start2, end2, expected_intersection):
+    r1 = create_recognizer_result("TYPE", 1.0, start1, end1)
+    r2 = create_recognizer_result("TYPE", 1.0, start2, end2)
+    assert r1.intersects(r2) == expected_intersection
+
+def create_recognizer_result(entity_type, score, start, end):
+    data = {"entity_type": entity_type, "score": score, "start": start, "end": end}
+    return RecognizerResult.from_json(data)
