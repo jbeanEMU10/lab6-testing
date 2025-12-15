@@ -14,7 +14,7 @@ def sample_run_anonymizer():
         operators={"PERSON": OperatorConfig("replace", {"new_value": "BIP"})}
     )
 
-    print(result)
+    return(result)
 
     # input should be:
     # text: My name is Bond.
@@ -27,6 +27,15 @@ def sample_run_anonymizer():
     # [
     #     {'start': 11, 'end': 14, 'entity_type': 'PERSON', 'text': 'BIP', 'operator': 'replace'}
     # ]
+    input_text = "My name is Bond."
+    input_start = 11
+    input_end = 15
+
+    result = sample_run_anonymizer(input_text, input_start, input_end)
+
+    print("text", result.text)
+    print("items:")
+    print(result.items)
 
 if __name__ == "__main__": 
     sample_run_anonymizer();
